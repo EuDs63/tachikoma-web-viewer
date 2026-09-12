@@ -1,0 +1,21 @@
+# Blender working files and backups
+*.blend
+*.blend1
+
+# Local research, audit, and generated working output
+.tools/
+audit/
+references/
+renders/
+tachikoma_locomotion_addon.zip
+/HEAD_REVIEW_V14.md
+/HIP_REVIEW_V15.md
+/LOCOMOTION_GUIDE.md
+/RIG_GUIDE.md
+/scripts/*
+!/scripts/export_web_v16.py
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.vscode/

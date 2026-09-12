@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#07151a" />
+    <meta
+      name="description"
+      content="塔奇克马 v16 的交互式 3D 展示：自由旋转、步行与轮式姿态，以及完整巡逻动画。"
+    />
+    <title>TACHIKOMA // Interactive Archive</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕷️</text></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="#top" aria-label="返回顶部">
+        <span class="wordmark__mark">TKM</span>
+        <span class="wordmark__text">Interactive Archive</span>
+      </a>
+      <nav aria-label="页面导航">
+        <a href="#viewer">模型</a>
+        <a href="#motion">动作</a>
+        <a href="#notes">档案</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" id="viewer" aria-labelledby="hero-title">
+        <div class="hero__copy">
+          <p class="eyebrow">STAND ALONE COMPLEX · PERSONAL MODEL STUDY</p>
+          <h1 id="hero-title">TACHIKOMA<br /><span>机动思考战车</span></h1>
+          <p class="lede">
+            从 Blender v16 交付版直接导出的交互模型。拖动旋转，滚轮缩放；切换步行、轮式与巡逻动画。
+          </p>
+          <div class="stat-row" aria-label="模型摘要">
+            <span><b>430</b> 帧</span>
+            <span><b>24</b> FPS</span>
+            <span><b>17.9</b> 秒</span>
+          </div>
+        </div>
+
+        <div class="viewer-shell" id="viewer-shell">
+          <div class="viewer-shell__grid" aria-hidden="true"></div>
+          <div
+            id="tachikoma-viewer"
+            class="three-viewer"
+            role="img"
+            aria-label="蓝色塔奇克马三维模型。可用鼠标或触控旋转和缩放。"
+          >
+            <div class="load-state" id="load-state">
+              <span class="load-state__ring" aria-hidden="true"></span>
+              <span>载入 3D 档案</span>
+            </div>
+            <div class="progress" aria-hidden="true">
+              <span id="progress-fill"></span>
+            </div>
+          </div>
+
+          <div class="mode-switcher" role="group" aria-label="模型模式">
+            <button class="mode is-active" type="button" data-mode="walk">步行姿态</button>
+            <button class="mode" type="button" data-mode="roll">轮式姿态</button>
+            <button class="mode" type="button" data-mode="patrol">巡逻动画</button>
+          </div>
+
+          <div class="viewer-tools">
+            <div class="view-switcher" role="group" aria-label="观察角度">
+              <button type="button" data-orbit="0deg 78deg 112%">正面</button>
+              <button type="button" data-orbit="90deg 78deg 112%">侧面</button>
+              <button type="button" data-orbit="180deg 78deg 112%">背面</button>
+              <button type="button" data-orbit="38deg 70deg 110%">三分之四</button>
+            </div>
+            <button class="icon-button" id="fullscreen" type="button" aria-label="全屏查看" title="全屏查看">↗</button>
+          </div>
+
+          <div class="transport" id="transport" hidden>
+            <button id="play-toggle" type="button" aria-label="暂停动画">Ⅱ</button>
+            <input id="timeline" type="range" min="0" max="1" value="0" step="0.001" aria-label="动画进度" />
+            <output id="timecode" for="timeline">00:00 / 00:18</output>
+          </div>
+          <p class="sr-only" id="viewer-status" aria-live="polite">步行姿态已载入</p>
+        </div>
+
+        <div class="hero__index" aria-hidden="true">16<span>/ 16</span></div>
+        <p class="scroll-note" aria-hidden="true"><span></span>SCROLL TO INSPECT</p>
+      </section>
+
+      <section class="motion" id="motion" aria-labelledby="motion-title">
+        <div class="section-label">MOTION LOG / 01</div>
+        <div class="motion__copy">
+          <p class="eyebrow">BAKED LOCOMOTION TEST</p>
+          <h2 id="motion-title">从谨慎步行，到轮式巡航。</h2>
+          <p>
+            这段 17.9 秒演示包含待机、四足步态、转向、停车、轮组对齐与轮式行驶。网页动画用于交互观察；下方视频保留 Blender 中的最终灯光与镜头结果。
+          </p>
+          <dl class="specs">
+            <div><dt>步态</dt><dd>FL → RR → FR → RL</dd></div>
+            <div><dt>支撑</dt><dd>至少三足</dd></div>
+            <div><dt>输出</dt><dd>glTF 2.0 / GLB</dd></div>
+          </dl>
+        </div>
+        <figure class="motion__video">
+          <video controls muted loop playsinline preload="metadata" poster="assets/poster.png">
+            <source src="assets/tachikoma-v16-patrol.mp4" type="video/mp4" />
+          </video>
+          <figcaption><span>REC 016</span> Blender 5.2.1 LTS · 960 × 720</figcaption>
+        </figure>
+      </section>
+
+      <section class="notes" id="notes" aria-labelledby="notes-title">
+        <div>
+          <p class="eyebrow">MODEL NOTES</p>
+          <h2 id="notes-title">一份可旋转的建模档案。</h2>
+        </div>
+        <div class="note-grid">
+          <article>
+            <span>01</span>
+            <h3>S.A.C. 造型取向</h3>
+            <p>以经典圆润背舱、三眼头部、连续腿甲和居中榴弹发射器为主要识别特征。</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>两套足部配置</h3>
+            <p>步行模式使用三瓣足，轮式模式保留竖直轮胎；网页可即时比较两种最终姿态。</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>浏览器友好</h3>
+            <p>导出时移除工作室地面、参考图与控制器，并使用 Draco 压缩降低页面传输体积。</p>
+          </article>
+        </div>
+        <div class="download-row">
+          <a class="primary-link" href="assets/tachikoma-walk.glb" download>下载 GLB <span>↓</span></a>
+          <a class="text-link" href="https://github.com/EuDs63/tachikoma-web-viewer">查看 GitHub 仓库 ↗</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>TACHIKOMA // V16</span>
+      <p>非商业同人建模习作。角色版权归原权利方所有。</p>
+      <span>2026 · SHANGHAI</span>
+    </footer>
+
+    <noscript>请启用 JavaScript 以查看交互式 3D 模型。</noscript>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
