@@ -1,7 +1,6 @@
-"""Export the reviewed Tachikoma model into browser-friendly GLB assets.
+"""Export the openable Tachikoma v17 into browser-friendly GLB assets.
 
-Run with Blender in background mode while opening
-``tachikoma_v16_reference_reviewed.blend``.
+Run with Blender in background mode while opening ``tachikoma_v17_openable.blend``.
 """
 
 from __future__ import annotations
@@ -16,6 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.path.join(ROOT, "docs", "assets")
 EXCLUDED_PREFIXES = ("TKM13_FloorMark",)
 EXCLUDED_NAMES = {"TKM11_StudioFloor"}
+OPEN_CONTROLS = ("pod_top_hatch", "pod_rear_doors", "pod_sensor_hatch")
 
 
 def is_model_object(obj: bpy.types.Object) -> bool:
@@ -26,30 +26,42 @@ def is_model_object(obj: bpy.types.Object) -> bool:
     return not obj.hide_render
 
 
-def select_model(frame: int) -> list[bpy.types.Object]:
+def select_model(frame: int, opened: bool) -> list[bpy.types.Object]:
     scene = bpy.context.scene
+    rig = bpy.data.objects["TACHIKOMA_RIG"]
     scene.frame_set(frame)
+    for control in OPEN_CONTROLS:
+        rig[control] = 1.0 if opened else 0.0
+    rig.update_tag()
+    bpy.context.evaluated_depsgraph_get().update()
     bpy.context.view_layer.update()
+
     for obj in scene.objects:
         obj.select_set(False)
+    selected_set = {obj for obj in scene.objects if is_model_object(obj)}
+    # v17 adds empty transform controls above the hatch and rear doors. The
+    # exporter needs those ancestors selected as nodes so their bone-parent
+    # relationship is available when serialising their child meshes.
+    for obj in tuple(selected_set):
+        parent = obj.parent
+        while parent is not None:
+            selected_set.add(parent)
+            parent = parent.parent
     selected = []
     for obj in scene.objects:
-        if is_model_object(obj):
+        if obj in selected_set:
             obj.hide_set(False)
             obj.select_set(True)
             selected.append(obj)
-    rig = bpy.data.objects.get("TACHIKOMA_RIG")
-    if rig and rig not in selected:
+    if rig not in selected:
         rig.hide_set(False)
         rig.select_set(True)
         selected.append(rig)
-    if rig:
-        bpy.context.view_layer.objects.active = rig
+    bpy.context.view_layer.objects.active = rig
     return selected
 
 
 def make_export_data_single_user() -> int:
-    """Avoid shared-mesh clones that break model-viewer's primitive mapping."""
     copies = 0
     for obj in bpy.context.scene.objects:
         if obj.type in {"MESH", "CURVE"} and obj.data and obj.data.users > 1:
@@ -58,8 +70,8 @@ def make_export_data_single_user() -> int:
     return copies
 
 
-def export_glb(filename: str, frame: int, animations: bool) -> dict:
-    selected = select_model(frame)
+def export_glb(filename: str, frame: int, animations: bool, opened: bool = False) -> dict:
+    selected = select_model(frame, opened)
     path = os.path.join(ASSET_DIR, filename)
     result = bpy.ops.export_scene.gltf(
         filepath=path,
@@ -88,6 +100,7 @@ def export_glb(filename: str, frame: int, animations: bool) -> dict:
     return {
         "file": filename,
         "frame": frame,
+        "opened": opened,
         "animations": animations,
         "objects": len(selected),
         "bytes": os.path.getsize(path),
@@ -100,9 +113,10 @@ exports = [
     export_glb("tachikoma-patrol.glb", frame=1, animations=True),
     export_glb("tachikoma-walk.glb", frame=96, animations=False),
     export_glb("tachikoma-roll.glb", frame=330, animations=False),
+    export_glb("tachikoma-open.glb", frame=1, animations=False, opened=True),
 ]
 
-report_path = os.path.join(ROOT, "audit", "web_export_v16.json")
+report_path = os.path.join(ROOT, "audit", "web_export_v17.json")
 with open(report_path, "w", encoding="utf-8") as handle:
     json.dump(
         {

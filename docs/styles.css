@@ -215,7 +215,7 @@ button:hover, button:focus-visible { color: #041214; border-color: var(--cyan); 
 .fullscreen { position: absolute; z-index: 7; top: 16px; right: 18px; }
 
 .control-deck { position: absolute; z-index: 8; left: 50%; bottom: 20px; width: min(620px, 70%); transform: translateX(-50%); }
-.mode-switcher { display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(2,11,13,.7); backdrop-filter: blur(10px); }
+.mode-switcher { display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(2,11,13,.7); backdrop-filter: blur(10px); }
 .mode-switcher button { min-height: 42px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .12em; }
 .mode-switcher button span { margin-right: 10px; color: rgba(98,242,232,.45); font-size: 8px; }
 .mode-switcher button.is-active { color: #031012; border-color: var(--cyan); background: var(--cyan); box-shadow: 0 0 24px rgba(98,242,232,.14); }
