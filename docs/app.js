@@ -77,6 +77,9 @@ scene.add(modelGroup);
 let activeMode = "walk";
 let mixer = null;
 let action = null;
+let animatedModel = null;
+const animatedBox = new THREE.Box3();
+const animatedCenter = new THREE.Vector3();
 let scrubbing = false;
 let paused = false;
 let viewRadius = 6;
@@ -111,6 +114,8 @@ function clearModel() {
   mixer?.stopAllAction();
   mixer = null;
   action = null;
+  animatedModel = null;
+  modelGroup.position.set(0, 0, 0);
   while (modelGroup.children.length) {
     const child = modelGroup.children.pop();
     child.traverse((object) => {
@@ -161,6 +166,7 @@ function loadModel(mode) {
         materials.forEach(tuneMaterial);
       });
       modelGroup.add(modelRoot);
+      animatedModel = modelRoot;
 
       const box = new THREE.Box3().setFromObject(modelRoot);
       const size = box.getSize(new THREE.Vector3());
@@ -222,6 +228,12 @@ function animate() {
   requestAnimationFrame(animate);
   const delta = Math.min(clock.getDelta(), 0.05);
   if (mixer && !paused && !scrubbing) mixer.update(delta);
+  if (mixer && animatedModel) {
+    modelGroup.updateMatrixWorld(true);
+    animatedBox.setFromObject(animatedModel).getCenter(animatedCenter);
+    modelGroup.position.x += modelCenter.x - animatedCenter.x;
+    modelGroup.position.z += modelCenter.z - animatedCenter.z;
+  }
   controls.update();
   updateTransport();
   renderer.render(scene, camera);
