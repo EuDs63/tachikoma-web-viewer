@@ -2,7 +2,7 @@
 
 塔奇克马 v16 的静态交互展示页。模型从 Blender 5.2.1 LTS 导出为 glTF 2.0 / GLB，支持自由旋转、步行与轮式姿态对比，以及 430 帧巡逻动作预览。
 
-线上页面：<https://euds63.github.io/tachikoma-web-viewer/>
+线上页面：<https://ds63.eu.org/tachikoma-web-viewer/>
 
 ## 本地预览
 
