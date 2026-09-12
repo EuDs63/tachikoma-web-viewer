@@ -129,7 +129,8 @@ function clearModel() {
 function frameModel(azimuth = 38, elevation = 70, scale = 1.1) {
   const polar = THREE.MathUtils.degToRad(elevation);
   const theta = THREE.MathUtils.degToRad(azimuth);
-  const distance = viewRadius * scale;
+  const responsiveScale = container.clientWidth <= 640 ? Math.max(scale, 1.4) : scale;
+  const distance = viewRadius * responsiveScale;
   camera.position.set(
     modelCenter.x + distance * Math.sin(polar) * Math.sin(theta),
     modelCenter.y + distance * Math.cos(polar),

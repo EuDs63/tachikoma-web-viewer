@@ -271,14 +271,16 @@ button:hover, button:focus-visible { color: #041214; border-color: var(--cyan); 
   .vertical-type { display: none; }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .hud-top { height: 58px; padding-inline: 12px; }
   .identity i, .top-links a:first-child { display: none; }
   .stage { padding: 65px 7px 38px; }
   .viewer-shell { inset: 65px 7px 39px; }
-  .intro { top: 12%; left: 18px; width: 84%; }
-  .kicker { margin-bottom: 12px; }
-  .summary { max-width: 285px; }
+  .intro { top: 92px; left: 20px; width: calc(100% - 40px); }
+  .kicker { margin-bottom: 10px; font-size: 7px; letter-spacing: .16em; }
+  h1 { font-size: clamp(3rem, 14.2vw, 4.6rem); line-height: .9; letter-spacing: -.055em; opacity: 1; }
+  h1 br { display: none; }
+  .summary { max-width: 310px; margin-top: 16px; padding-block: 5px; font-size: 9px; line-height: 1.75; }
   .telemetry { display: none; }
   .view-switcher { top: 12px; }
   .view-switcher button { padding: 6px 7px; }
