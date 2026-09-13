@@ -13,7 +13,7 @@ tachikoma_locomotion_addon.zip
 /LOCOMOTION_GUIDE.md
 /RIG_GUIDE.md
 /scripts/*
-!/scripts/export_web_v17.py
+!/scripts/export_web_v19.py
 /.codex-remote-attachments/
 
 # OS and editor noise

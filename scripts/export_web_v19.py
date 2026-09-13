@@ -1,6 +1,7 @@
-"""Export the openable Tachikoma v17 into browser-friendly GLB assets.
+"""Export the refined Tachikoma v19 into browser-friendly GLB assets.
 
-Run with Blender in background mode while opening ``tachikoma_v17_openable.blend``.
+Run with Blender in background mode while opening
+``tachikoma_v19_fidelity_refined.blend``.
 """
 
 from __future__ import annotations
@@ -15,7 +16,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.path.join(ROOT, "docs", "assets")
 EXCLUDED_PREFIXES = ("TKM13_FloorMark",)
 EXCLUDED_NAMES = {"TKM11_StudioFloor"}
-OPEN_CONTROLS = ("pod_top_hatch", "pod_rear_doors", "pod_sensor_hatch")
+OPEN_CONTROLS = (
+    "pod_top_hatch",
+    "pod_rear_doors",
+    "pod_sensor_hatch",
+    "pod_sensor_flip",
+)
 
 
 def is_model_object(obj: bpy.types.Object) -> bool:
@@ -39,9 +45,8 @@ def select_model(frame: int, opened: bool) -> list[bpy.types.Object]:
     for obj in scene.objects:
         obj.select_set(False)
     selected_set = {obj for obj in scene.objects if is_model_object(obj)}
-    # v17 adds empty transform controls above the hatch and rear doors. The
-    # exporter needs those ancestors selected as nodes so their bone-parent
-    # relationship is available when serialising their child meshes.
+    # Hatch, door and sensor meshes sit below empty transform controls. Keep
+    # every ancestor so the glTF exporter can serialize their bone parenting.
     for obj in tuple(selected_set):
         parent = obj.parent
         while parent is not None:
@@ -116,7 +121,7 @@ exports = [
     export_glb("tachikoma-open.glb", frame=1, animations=False, opened=True),
 ]
 
-report_path = os.path.join(ROOT, "audit", "web_export_v17.json")
+report_path = os.path.join(ROOT, "audit", "web_export_v19.json")
 with open(report_path, "w", encoding="utf-8") as handle:
     json.dump(
         {

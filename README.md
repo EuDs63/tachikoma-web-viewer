@@ -1,6 +1,6 @@
 # Tachikoma Interactive Archive
 
-网页当前展示塔奇克马 v17，模型从 Blender 5.2.1 LTS 导出为 glTF 2.0 / GLB，支持自由旋转、步行与轮式姿态对比、开舱内构展示，以及 430 帧巡逻动作预览。Blender 工程为 `tachikoma_v17_openable.blend`，在 v16 绑定与巡逻动作上新增了可升降顶盖、左右后舱门、空座舱内构，以及参考底视重制的六向放射底盘。
+网页当前展示塔奇克马 v19，模型从 Blender 5.2.1 LTS 导出为 glTF 2.0 / GLB，支持自由旋转、步行与轮式姿态对比、开舱内构展示，以及 426 帧巡逻动作预览。本版继续修正四髋、腿座与站姿比例，重绑并重新生成巡逻动作；同时细化胸托、操纵杆、检修盖凸筋、后门锁条和头壳细节。操作说明见 [OPENABLE_V19_GUIDE.md](OPENABLE_V19_GUIDE.md)。
 
 线上页面：<https://ds63.eu.org/tachikoma-web-viewer/>
 
@@ -19,10 +19,10 @@ python -m http.server 4173 --directory docs
 项目工作文件位于本地 Blender 工程中；仓库提交浏览器所需的压缩 GLB，不提交历史 `.blend` 文件。重新导出：
 
 ```powershell
-D:\Blender\blender.exe --background tachikoma_v17_openable.blend --python scripts\export_web_v17.py
+D:\Blender\blender.exe --background tachikoma_v19_fidelity_refined.blend --python scripts\export_web_v19.py
 ```
 
-v17 的开舱操作与复现说明见 `OPENABLE_V17_GUIDE.md`。网页使用独立的 OPEN 模式展示全部舱门打开后的座舱内构。
+网页使用独立的 OPEN 模式展示顶盖、后舱门及双目检修组件展开后的座舱内构。
 
 ## 说明
 
