@@ -19,7 +19,12 @@ const fullscreen = document.querySelector("#fullscreen");
 const models = {
   walk: { src: "assets/tachikoma-walk.glb?v=19", label: "步行姿态", animated: false },
   roll: { src: "assets/tachikoma-roll.glb?v=19", label: "轮式姿态", animated: false },
-  open: { src: "assets/tachikoma-open.glb?v=19", label: "开舱姿态", animated: false },
+  open: {
+    src: "assets/tachikoma-open.glb?v=19",
+    label: "开舱姿态",
+    animated: false,
+    view: [218, 70, 1.22],
+  },
   patrol: { src: "assets/tachikoma-patrol.glb?v=19", label: "巡逻动画", animated: true },
 };
 
@@ -85,6 +90,7 @@ let scrubbing = false;
 let paused = false;
 let viewRadius = 6;
 let modelCenter = new THREE.Vector3(0, 2.5, 0);
+let activeView = { azimuth: 38, elevation: 70, scale: 1.1 };
 let loadSerial = 0;
 
 function tuneMaterial(material) {
@@ -128,9 +134,14 @@ function clearModel() {
 }
 
 function frameModel(azimuth = 38, elevation = 70, scale = 1.1) {
+  activeView = { azimuth, elevation, scale };
   const polar = THREE.MathUtils.degToRad(elevation);
   const theta = THREE.MathUtils.degToRad(azimuth);
-  const responsiveScale = container.clientWidth <= 640 ? Math.max(scale, 1.4) : scale;
+  // PerspectiveCamera.fov is vertical. On portrait viewports the horizontal
+  // field of view is smaller, so fitting by vertical FOV alone crops the model.
+  const aspectScale = Math.max(1, 1 / Math.max(camera.aspect, 0.01));
+  const portraitPadding = camera.aspect < 1 ? 1.08 : 1;
+  const responsiveScale = scale * aspectScale * portraitPadding;
   const distance = viewRadius * responsiveScale;
   camera.position.set(
     modelCenter.x + distance * Math.sin(polar) * Math.sin(theta),
@@ -175,7 +186,7 @@ function loadModel(mode) {
       modelCenter = box.getCenter(new THREE.Vector3());
       viewRadius = Math.max(size.x, size.y, size.z) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
       ground.position.y = box.min.y - 0.015;
-      frameModel();
+      frameModel(...(config.view || [38, 70, 1.1]));
 
       if (config.animated && gltf.animations.length) {
         mixer = new THREE.AnimationMixer(modelRoot);
@@ -221,9 +232,13 @@ function formatTime(seconds) {
 function resize() {
   const width = Math.max(1, container.clientWidth);
   const height = Math.max(1, container.clientHeight);
+  const previousAspect = camera.aspect;
   renderer.setSize(width, height, false);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
+  if (modelGroup.children.length && Math.abs(previousAspect - camera.aspect) > 0.01) {
+    frameModel(activeView.azimuth, activeView.elevation, activeView.scale);
+  }
 }
 
 function animate() {
