@@ -22,7 +22,7 @@ python -m http.server 4173 --directory docs
 D:\Blender\blender.exe --background tachikoma_v20_connection_repaired.blend --python scripts\export_web_v20.py
 ```
 
-网页使用独立的 OPEN 模式展示顶盖、后舱门及双目检修组件展开后的座舱内构；v20 的展开件都具备可追踪到固定壳体的可见连接结构。
+网页使用独立的 OPEN 模式展示顶盖、后舱门及双目检修组件展开后的座舱内构；v20 的展开件都具备可追踪到固定壳体的可见连接结构。查看器支持左键/单指环绕、右键/双指平移、滚轮/捏合缩放，以及聚焦画布后的 WASD 前后左右、Q/E 升降、Shift 加速和 Home/RESET 复位。
 
 ## 说明
 

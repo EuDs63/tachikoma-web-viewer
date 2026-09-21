@@ -15,6 +15,7 @@ const progressFill = document.querySelector("#progress-fill");
 const loadState = document.querySelector("#load-state");
 const status = document.querySelector("#viewer-status");
 const fullscreen = document.querySelector("#fullscreen");
+const cameraReset = document.querySelector("#camera-reset");
 
 const models = {
   walk: { src: "assets/tachikoma-walk.glb?v=20", label: "步行姿态", animated: false },
@@ -39,6 +40,8 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.domElement.tabIndex = 0;
 renderer.domElement.setAttribute("aria-label", "交互式塔奇克马三维视图");
+renderer.domElement.setAttribute("aria-describedby", "camera-help camera-help-detail");
+renderer.domElement.setAttribute("aria-keyshortcuts", "W S A D Q E ArrowUp ArrowDown ArrowLeft ArrowRight Home");
 container.prepend(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -47,6 +50,9 @@ controls.dampingFactor = 0.065;
 controls.minPolarAngle = THREE.MathUtils.degToRad(18);
 controls.maxPolarAngle = THREE.MathUtils.degToRad(155);
 controls.zoomToCursor = true;
+controls.enablePan = true;
+controls.screenSpacePanning = true;
+controls.panSpeed = 0.9;
 
 scene.add(new THREE.HemisphereLight(0xc8f5ff, 0x16333b, 2.0));
 const keyLight = new THREE.DirectionalLight(0xffffff, 4.0);
@@ -92,6 +98,19 @@ let viewRadius = 6;
 let modelCenter = new THREE.Vector3(0, 2.5, 0);
 let activeView = { azimuth: 38, elevation: 70, scale: 1.1 };
 let loadSerial = 0;
+let userNavigated = false;
+const movementKeys = new Set();
+const moveDirection = new THREE.Vector3();
+const cameraForward = new THREE.Vector3();
+const cameraRight = new THREE.Vector3();
+const cameraScreenUp = new THREE.Vector3();
+const movementStep = new THREE.Vector3();
+const worldUp = new THREE.Vector3(0, 1, 0);
+const movementCodes = new Set([
+  "KeyW", "KeyS", "KeyA", "KeyD", "KeyQ", "KeyE",
+  "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+  "ShiftLeft", "ShiftRight",
+]);
 
 function tuneMaterial(material) {
   const name = material.name || "";
@@ -134,6 +153,13 @@ function clearModel() {
 }
 
 function frameModel(azimuth = 38, elevation = 70, scale = 1.1) {
+  // OrbitControls retains rotation/pan momentum while damping is enabled.
+  // Flush it against the old view before applying an exact preset or reset.
+  const dampingEnabled = controls.enableDamping;
+  controls.enableDamping = false;
+  controls.update();
+  controls.enableDamping = dampingEnabled;
+
   activeView = { azimuth, elevation, scale };
   const polar = THREE.MathUtils.degToRad(elevation);
   const theta = THREE.MathUtils.degToRad(azimuth);
@@ -152,6 +178,51 @@ function frameModel(azimuth = 38, elevation = 70, scale = 1.1) {
   controls.minDistance = viewRadius * 0.53;
   controls.maxDistance = viewRadius * 2.4;
   controls.update();
+}
+
+function defaultView() {
+  return models[activeMode]?.view || [38, 70, 1.1];
+}
+
+function resetCamera() {
+  clearMovementKeys();
+  userNavigated = false;
+  frameModel(...defaultView());
+  renderer.domElement.focus({ preventScroll: true });
+  status.textContent = `${models[activeMode].label}摄像机已重置`;
+}
+
+function clearMovementKeys() {
+  movementKeys.clear();
+}
+
+function updateCameraMovement(delta) {
+  if (!movementKeys.size || document.activeElement !== renderer.domElement) return;
+
+  camera.updateMatrixWorld();
+  camera.getWorldDirection(cameraForward).normalize();
+  cameraRight.crossVectors(cameraForward, camera.up).normalize();
+  cameraScreenUp.setFromMatrixColumn(camera.matrixWorld, 1).normalize();
+  moveDirection.set(0, 0, 0);
+
+  if (movementKeys.has("KeyW")) moveDirection.add(cameraForward);
+  if (movementKeys.has("KeyS")) moveDirection.sub(cameraForward);
+  if (movementKeys.has("KeyD")) moveDirection.add(cameraRight);
+  if (movementKeys.has("KeyA")) moveDirection.sub(cameraRight);
+  if (movementKeys.has("KeyE")) moveDirection.add(worldUp);
+  if (movementKeys.has("KeyQ")) moveDirection.sub(worldUp);
+  if (movementKeys.has("ArrowRight")) moveDirection.add(cameraRight);
+  if (movementKeys.has("ArrowLeft")) moveDirection.sub(cameraRight);
+  if (movementKeys.has("ArrowUp")) moveDirection.add(cameraScreenUp);
+  if (movementKeys.has("ArrowDown")) moveDirection.sub(cameraScreenUp);
+  if (!moveDirection.lengthSq()) return;
+
+  const accelerated = movementKeys.has("ShiftLeft") || movementKeys.has("ShiftRight");
+  const speed = viewRadius * 0.35 * (accelerated ? 2.5 : 1);
+  movementStep.copy(moveDirection).normalize().multiplyScalar(speed * delta);
+  camera.position.add(movementStep);
+  controls.target.add(movementStep);
+  userNavigated = true;
 }
 
 function loadModel(mode) {
@@ -186,6 +257,7 @@ function loadModel(mode) {
       modelCenter = box.getCenter(new THREE.Vector3());
       viewRadius = Math.max(size.x, size.y, size.z) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
       ground.position.y = box.min.y - 0.015;
+      userNavigated = false;
       frameModel(...(config.view || [38, 70, 1.1]));
 
       if (config.animated && gltf.animations.length) {
@@ -236,7 +308,7 @@ function resize() {
   renderer.setSize(width, height, false);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  if (modelGroup.children.length && Math.abs(previousAspect - camera.aspect) > 0.01) {
+  if (!userNavigated && modelGroup.children.length && Math.abs(previousAspect - camera.aspect) > 0.01) {
     frameModel(activeView.azimuth, activeView.elevation, activeView.scale);
   }
 }
@@ -244,6 +316,7 @@ function resize() {
 function animate() {
   requestAnimationFrame(animate);
   const delta = Math.min(clock.getDelta(), 0.05);
+  updateCameraMovement(delta);
   if (mixer && !paused && !scrubbing) mixer.update(delta);
   if (mixer && animatedModel) {
     modelGroup.updateMatrixWorld(true);
@@ -259,8 +332,40 @@ function animate() {
 modes.forEach((button) => button.addEventListener("click", () => loadModel(button.dataset.mode)));
 viewButtons.forEach((button) => button.addEventListener("click", () => {
   const [azimuth, elevation, scale] = button.dataset.orbit.match(/[\d.]+/g).map(Number);
+  userNavigated = false;
   frameModel(azimuth, elevation, scale / 100);
 }));
+
+controls.addEventListener("start", () => { userNavigated = true; });
+renderer.domElement.addEventListener("pointerdown", () => {
+  renderer.domElement.focus({ preventScroll: true });
+});
+renderer.domElement.addEventListener("keydown", (event) => {
+  if (event.code === "Home") {
+    event.preventDefault();
+    resetCamera();
+    return;
+  }
+  if (!movementCodes.has(event.code)) return;
+  event.preventDefault();
+  const wasActive = movementKeys.has(event.code);
+  movementKeys.add(event.code);
+  if (!wasActive && !event.repeat && !event.code.startsWith("Shift")) {
+    updateCameraMovement(0.08);
+  }
+});
+renderer.domElement.addEventListener("keyup", (event) => {
+  if (!movementCodes.has(event.code)) return;
+  event.preventDefault();
+  movementKeys.delete(event.code);
+});
+renderer.domElement.addEventListener("blur", clearMovementKeys);
+window.addEventListener("blur", clearMovementKeys);
+window.addEventListener("pagehide", clearMovementKeys);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) clearMovementKeys();
+});
+cameraReset.addEventListener("click", resetCamera);
 
 playToggle.addEventListener("click", () => {
   if (!action) return;

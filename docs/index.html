@@ -8,7 +8,7 @@
     <link rel="canonical" href="https://ds63.eu.org/tachikoma-web-viewer/" />
     <title>TACHIKOMA // SHELL_020</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>◉</text></svg>" />
-    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="styles.css?v=20-camera1" />
     <script type="importmap">
       {
         "imports": {
@@ -37,7 +37,7 @@
       <section class="intro" aria-labelledby="title">
         <p class="kicker">CYBERBRAIN / AUTONOMOUS UNIT</p>
         <h1 id="title">TACHI<br />KOMA</h1>
-        <p class="summary">具备独立思考能力的多足步行战车。拖动查看，切换足部形态或打开座舱。</p>
+        <p class="summary">具备独立思考能力的多足步行战车。环绕观察或自由移动摄像机，并切换足部形态与座舱状态。</p>
       </section>
 
       <div class="viewer-shell" id="viewer-shell">
@@ -50,8 +50,8 @@
         <div
           id="tachikoma-viewer"
           class="three-viewer"
-          role="img"
-          aria-label="蓝色塔奇克马三维模型。可用鼠标或触控旋转和缩放。"
+          role="region"
+          aria-label="蓝色塔奇克马交互式三维模型"
         >
           <div class="load-state" id="load-state">
             <span class="load-state__ring" aria-hidden="true"></span>
@@ -65,9 +65,15 @@
           <button type="button" data-orbit="90deg 78deg 112%">SIDE</button>
           <button type="button" data-orbit="180deg 78deg 112%">REAR</button>
           <button type="button" data-orbit="38deg 70deg 110%">3/4</button>
+          <button id="camera-reset" type="button" aria-label="重置摄像机视角">RESET</button>
         </div>
 
         <button class="fullscreen" id="fullscreen" type="button" aria-label="全屏查看">EXPAND ↗</button>
+
+        <p class="camera-hint" id="camera-help">
+          <span class="camera-hint__desktop">左键环绕 · 右键平移 · 滚轮缩放 · 点击后 WASD/QE 移动</span>
+          <span class="camera-hint__touch">单指环绕 · 双指平移 / 缩放</span>
+        </p>
 
         <div class="control-deck">
           <div class="mode-switcher" role="group" aria-label="模型模式">
@@ -83,6 +89,7 @@
           </div>
         </div>
 
+        <p class="sr-only" id="camera-help-detail">聚焦三维视图后，W 和 S 前进后退，A 和 D 左右移动，Q 和 E 下降上升，方向键沿屏幕平移，按住 Shift 加速，Home 重置摄像机。</p>
         <p class="sr-only" id="viewer-status" aria-live="polite">步行姿态正在载入</p>
       </div>
 
@@ -102,6 +109,6 @@
     </footer>
 
     <noscript>请启用 JavaScript 以查看交互式 3D 模型。</noscript>
-    <script type="module" src="app.js?v=20-connect1"></script>
+    <script type="module" src="app.js?v=20-camera1"></script>
   </body>
 </html>
