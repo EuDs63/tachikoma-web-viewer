@@ -1,7 +1,7 @@
-"""Export the refined Tachikoma v19 into browser-friendly GLB assets.
+"""Export the connection-repaired Tachikoma v20 as browser GLB assets.
 
 Run with Blender in background mode while opening
-``tachikoma_v19_fidelity_refined.blend``.
+``tachikoma_v20_connection_repaired.blend``.
 """
 
 from __future__ import annotations
@@ -45,8 +45,8 @@ def select_model(frame: int, opened: bool) -> list[bpy.types.Object]:
     for obj in scene.objects:
         obj.select_set(False)
     selected_set = {obj for obj in scene.objects if is_model_object(obj)}
-    # Hatch, door and sensor meshes sit below empty transform controls. Keep
-    # every ancestor so the glTF exporter can serialize their bone parenting.
+    # Opening meshes sit below transform controls. Preserve all ancestors so
+    # the exporter serializes the v20 supports, hinges and binocular yoke.
     for obj in tuple(selected_set):
         parent = obj.parent
         while parent is not None:
@@ -121,7 +121,7 @@ exports = [
     export_glb("tachikoma-open.glb", frame=1, animations=False, opened=True),
 ]
 
-report_path = os.path.join(ROOT, "audit", "web_export_v19.json")
+report_path = os.path.join(ROOT, "audit", "web_export_v20.json")
 with open(report_path, "w", encoding="utf-8") as handle:
     json.dump(
         {

@@ -17,15 +17,15 @@ const status = document.querySelector("#viewer-status");
 const fullscreen = document.querySelector("#fullscreen");
 
 const models = {
-  walk: { src: "assets/tachikoma-walk.glb?v=19", label: "步行姿态", animated: false },
-  roll: { src: "assets/tachikoma-roll.glb?v=19", label: "轮式姿态", animated: false },
+  walk: { src: "assets/tachikoma-walk.glb?v=20", label: "步行姿态", animated: false },
+  roll: { src: "assets/tachikoma-roll.glb?v=20", label: "轮式姿态", animated: false },
   open: {
-    src: "assets/tachikoma-open.glb?v=19",
+    src: "assets/tachikoma-open.glb?v=20",
     label: "开舱姿态",
     animated: false,
     view: [218, 70, 1.22],
   },
-  patrol: { src: "assets/tachikoma-patrol.glb?v=19", label: "巡逻动画", animated: true },
+  patrol: { src: "assets/tachikoma-patrol.glb?v=20", label: "巡逻动画", animated: true },
 };
 
 const scene = new THREE.Scene();
@@ -99,7 +99,7 @@ function tuneMaterial(material) {
   material.emissiveIntensity = 0;
   if (/RedLight/i.test(name)) {
     material.color.set("#ff3e34"); material.emissive?.set("#ff2018"); material.emissiveIntensity = 2.4;
-  } else if (/GripperGreen/i.test(name)) {
+  } else if (/GripperGreen|SensorGreen/i.test(name)) {
     material.color.set("#48de73"); material.emissive?.set("#1abf51"); material.emissiveIntensity = 1.5;
   } else if (/OpticWhite/i.test(name)) {
     material.color.set("#e9f4f2"); material.metalness = 0.12; material.roughness = 0.2;
