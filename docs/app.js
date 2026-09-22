@@ -18,15 +18,15 @@ const fullscreen = document.querySelector("#fullscreen");
 const cameraReset = document.querySelector("#camera-reset");
 
 const models = {
-  walk: { src: "assets/tachikoma-walk.glb?v=20", label: "步行姿态", animated: false },
-  roll: { src: "assets/tachikoma-roll.glb?v=20", label: "轮式姿态", animated: false },
+  walk: { src: "assets/tachikoma-walk.glb?v=21-optic1", label: "步行姿态", animated: false },
+  roll: { src: "assets/tachikoma-roll.glb?v=21-optic1", label: "轮式姿态", animated: false },
   open: {
-    src: "assets/tachikoma-open.glb?v=20",
+    src: "assets/tachikoma-open.glb?v=21-optic1",
     label: "开舱姿态",
     animated: false,
     view: [218, 70, 1.22],
   },
-  patrol: { src: "assets/tachikoma-patrol.glb?v=20", label: "巡逻动画", animated: true },
+  patrol: { src: "assets/tachikoma-patrol.glb?v=21-optic1", label: "巡逻动画", animated: true },
 };
 
 const scene = new THREE.Scene();

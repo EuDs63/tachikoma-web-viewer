@@ -14,6 +14,11 @@ tachikoma_locomotion_addon.zip
 /RIG_GUIDE.md
 /scripts/*
 !/scripts/export_web_v20.py
+!/scripts/export_web_v21.py
+!/scripts/fix_front_lamp_mounts_v21.py
+!/scripts/render_front_lamp_review_v21.py
+!/scripts/validate_front_lamp_mounts_v21.py
+!/scripts/validate_web_glbs_v21.py
 /.codex-remote-attachments/
 
 # OS and editor noise
