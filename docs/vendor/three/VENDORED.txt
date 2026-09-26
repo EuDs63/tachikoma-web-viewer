@@ -1,0 +1,5 @@
+Three.js 0.180.0
+Source: https://registry.npmjs.org/three/-/three-0.180.0.tgz
+Subset: core + OrbitControls + GLTFLoader + DRACOLoader + RoomEnvironment and their transitive dependencies.
+License: MIT (see LICENSE).
+Draco decoder files are distributed with Three.js; see examples/jsm/libs/draco/README.md.
